@@ -11,6 +11,10 @@ type UsersRepository struct {
 	Path string
 }
 
+func New(dataSourcePatg string) {
+	// TODO: тут добавить создание таблицы
+}
+
 func (u UsersRepository) Get() ([]models.User, error) {
 	db, err := sql.Open("sqlite3", u.Path)
 	if err != nil {
@@ -78,7 +82,7 @@ func (u UsersRepository) Insert(obj models.User) (int, error) {
 	return int(id), nil
 }
 
-func (u UsersRepository) Update(obj models.User) error {
+func (u UsersRepository) Update(id int, obj models.User) error {
 	db, err := sql.Open("sqlite3", u.Path)
 	if err != nil {
 		return fmt.Errorf("failed to connect to database: %w", err)
@@ -86,7 +90,7 @@ func (u UsersRepository) Update(obj models.User) error {
 
 	defer db.Close()
 
-	_, err = db.Exec("UPDATE users SET login = $1, password = $2 WHERE id = $3", obj.Login, obj.Password, obj.Id)
+	_, err = db.Exec("UPDATE users SET login = $1, password = $2 WHERE id = $3", obj.Login, obj.Password, id)
 	if err != nil {
 		return err
 	}

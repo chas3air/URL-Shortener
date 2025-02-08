@@ -2,8 +2,8 @@ package database
 
 import (
 	"URL-Shortener/internal/database/models"
-	"URL-Shortener/internal/database/repositories/recordsrepository"
-	"URL-Shortener/internal/database/repositories/usersrepository"
+	recordsrepository "URL-Shortener/internal/database/repositories/records"
+	usersrepository "URL-Shortener/internal/database/repositories/users"
 )
 
 func MustGetInstanseOfDatabase(dataSourceName string) *models.DataBase {

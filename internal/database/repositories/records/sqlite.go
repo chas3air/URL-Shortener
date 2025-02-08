@@ -11,6 +11,10 @@ type RecordsRepository struct {
 	Path string
 }
 
+func New(dataSourcePatg string) {
+	// TODO: тут добавить создание таблицы
+}
+
 func (rep RecordsRepository) Get() ([]models.DbRecord, error) {
 	db, err := sql.Open("sqlite3", rep.Path)
 	if err != nil {
@@ -78,14 +82,14 @@ func (rep RecordsRepository) Insert(obj models.DbRecord) (int, error) {
 	return int(id), nil
 }
 
-func (rep RecordsRepository) Update(obj models.DbRecord) error {
+func (rep RecordsRepository) Update(id int, obj models.DbRecord) error {
 	db, err := sql.Open("sqlite3", rep.Path)
 	if err != nil {
 		return fmt.Errorf("failed to connect to database: %w", err)
 	}
 	defer db.Close()
 
-	_, err = db.Exec("UPDATE records SET url = $1, alias = $2 WHERE id = $3", obj.URL, obj.Alias, obj.Id)
+	_, err = db.Exec("UPDATE records SET url = $1, alias = $2 WHERE id = $3", obj.URL, obj.Alias, id)
 	if err != nil {
 		return err
 	}

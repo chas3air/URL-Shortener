@@ -38,7 +38,13 @@ func (a *App) StartServer() error {
 	r := mux.NewRouter()
 	r.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("pong"))
-	})
+	}).Methods(http.MethodGet)
+	r.HandleFunc("/users", uc.Get).Methods(http.MethodGet)
+	r.HandleFunc("/users/{id}/", uc.GetById).Methods(http.MethodGet)
+	r.HandleFunc("/users/login", uc.GetByLoginAndPassword).Methods(http.MethodGet)
+	r.HandleFunc("/users", uc.Insert).Methods(http.MethodPost)
+	r.HandleFunc("/users/{id}", uc.Update).Methods(http.MethodPut)
+	r.HandleFunc("/users/{id}", uc.Delete).Methods(http.MethodDelete)
 
 	a.srv = &http.Server{
 		Addr:    fmt.Sprintf(":%d", a.cfg.Port),
