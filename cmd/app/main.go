@@ -12,8 +12,10 @@ import (
 
 func main() {
 	cfg := config.MustLoad()
+	log.Print("config was loaded")
 
 	storage := database.MustGetInstanseOfDatabase(cfg.StoragePath)
+	log.Println("storage was initialised")
 
 	application := app.New(cfg, storage)
 

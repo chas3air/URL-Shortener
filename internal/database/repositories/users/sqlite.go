@@ -5,17 +5,34 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type UsersRepository struct {
 	Path string
 }
 
-func New(dataSourcePatg string) {
-	// TODO: тут добавить создание таблицы
+func New(dataSourcePath string) *UsersRepository {
+	db, err := sql.Open("sqlite3", dataSourcePath)
+	if err != nil {
+		log.Fatal("failed to connect to database, error:", err)
+	}
+	defer db.Close()
+
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS users (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		login TEXT NOT NULL,
+		password TEXT NOT NULL
+	)`)
+	if err != nil {
+		log.Fatal("failed to create table, error:", err)
+	}
+
+	return &UsersRepository{Path: dataSourcePath}
 }
 
-func (u UsersRepository) Get() ([]models.User, error) {
+func (u *UsersRepository) Get() ([]models.User, error) {
 	db, err := sql.Open("sqlite3", u.Path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
@@ -43,7 +60,7 @@ func (u UsersRepository) Get() ([]models.User, error) {
 	return users, nil
 }
 
-func (u UsersRepository) GetById(id int) (models.User, error) {
+func (u *UsersRepository) GetById(id int) (models.User, error) {
 	db, err := sql.Open("sqlite3", u.Path)
 	if err != nil {
 		return models.User{}, fmt.Errorf("failed to connect to database: %w", err)
@@ -61,7 +78,7 @@ func (u UsersRepository) GetById(id int) (models.User, error) {
 	return user, nil
 }
 
-func (u UsersRepository) Insert(obj models.User) (int, error) {
+func (u *UsersRepository) Insert(obj models.User) (int, error) {
 	db, err := sql.Open("sqlite3", u.Path)
 	if err != nil {
 		return 0, fmt.Errorf("failed to connect to database: %w", err)
@@ -82,7 +99,7 @@ func (u UsersRepository) Insert(obj models.User) (int, error) {
 	return int(id), nil
 }
 
-func (u UsersRepository) Update(id int, obj models.User) error {
+func (u *UsersRepository) Update(id int, obj models.User) error {
 	db, err := sql.Open("sqlite3", u.Path)
 	if err != nil {
 		return fmt.Errorf("failed to connect to database: %w", err)
@@ -98,7 +115,7 @@ func (u UsersRepository) Update(id int, obj models.User) error {
 	return nil
 }
 
-func (u UsersRepository) Delete(id int) (models.User, error) {
+func (u *UsersRepository) Delete(id int) (models.User, error) {
 	user, err := u.GetById(id)
 	if err != nil {
 		return models.User{}, err

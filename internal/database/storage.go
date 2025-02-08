@@ -8,7 +8,7 @@ import (
 
 func MustGetInstanseOfDatabase(dataSourceName string) *models.DataBase {
 	return &models.DataBase{
-		Users:   usersrepository.UsersRepository{Path: dataSourceName},
-		Records: recordsrepository.RecordsRepository{Path: dataSourceName},
+		Users:   usersrepository.New(dataSourceName),
+		Records: recordsrepository.New(dataSourceName),
 	}
 }
