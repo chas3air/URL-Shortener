@@ -32,7 +32,7 @@ func New(cfg *config.Config, storage *models.DataBase) *App {
 }
 
 func (a *App) StartServer() error {
-	uc := userscontroller.New(a.storage, &http.Client{Timeout: a.cfg.ContextTime})
+	uc := userscontroller.New(a.storage.Users, &http.Client{Timeout: a.cfg.ContextTime})
 	_ = uc
 
 	r := mux.NewRouter()
