@@ -1,11 +1,10 @@
 package usersrepository
 
 import (
+	"URL-Shortener/internal/database/models"
 	"database/sql"
 	"fmt"
 	"log"
-
-	"github.com/chas3air/URL-Shortener/DAL/pkg/models"
 )
 
 type UsersRepository struct {
@@ -58,20 +57,25 @@ func (u UsersRepository) GetById(id int) (models.User, error) {
 	return user, nil
 }
 
-func (u UsersRepository) Insert(obj models.User) error {
+func (u UsersRepository) Insert(obj models.User) (int, error) {
 	db, err := sql.Open("sqlite3", u.Path)
 	if err != nil {
-		return fmt.Errorf("failed to connect to database: %w", err)
+		return 0, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
 	defer db.Close()
 
-	_, err = db.Exec("INSERT INTO users (login, password) VALUES ($1, $2)", obj.Login, obj.Password)
+	res, err := db.Exec("INSERT INTO users (login, password) VALUES ($1, $2)", obj.Login, obj.Password)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	id, err := res.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
 }
 
 func (u UsersRepository) Update(obj models.User) error {

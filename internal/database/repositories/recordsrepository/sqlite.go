@@ -1,11 +1,10 @@
 package recordsrepository
 
 import (
+	"URL-Shortener/internal/database/models"
 	"database/sql"
 	"fmt"
 	"log"
-
-	"github.com/chas3air/URL-Shortener/DAL/pkg/models"
 )
 
 type RecordsRepository struct {
@@ -58,20 +57,25 @@ func (rep RecordsRepository) GetById(id int) (models.DbRecord, error) {
 	return record, nil
 }
 
-func (rep RecordsRepository) Insert(obj models.DbRecord) error {
+func (rep RecordsRepository) Insert(obj models.DbRecord) (int, error) {
 	db, err := sql.Open("sqlite3", rep.Path)
 	if err != nil {
-		return fmt.Errorf("failed to connect to database: %w", err)
+		return 0, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
 	defer db.Close()
 
-	_, err = db.Exec("INSERT INTO records (url, alias) VALUES ($1, $2)", obj.URL, obj.Alias)
+	res, err := db.Exec("INSERT INTO records (url, alias) VALUES ($1, $2)", obj.URL, obj.Alias)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	id, err := res.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
 }
 
 func (rep RecordsRepository) Update(obj models.DbRecord) error {
