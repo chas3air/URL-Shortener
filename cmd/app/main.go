@@ -3,7 +3,8 @@ package main
 import (
 	"URL-Shortener/internal/app"
 	"URL-Shortener/internal/config"
-	"URL-Shortener/internal/database"
+	"URL-Shortener/internal/storage/sqlite"
+
 	"log"
 	"os"
 	"os/signal"
@@ -14,7 +15,7 @@ func main() {
 	cfg := config.MustLoad()
 	log.Print("config was loaded")
 
-	storage := database.MustGetInstanseOfDatabase(cfg.StoragePath)
+	storage := urlrepository.New(cfg.StoragePath)
 	log.Println("storage was initialised")
 
 	application := app.New(cfg, storage)
@@ -31,8 +32,5 @@ func main() {
 	<-stop
 
 	log.Println("stopping application")
-	if err := application.Stop(); err != nil {
-		log.Println("error stopping application:", err)
-	}
 	log.Println("application stopped")
 }
